@@ -1,0 +1,79 @@
+{% extends "index.html" %}
+{% block content %}
+    <div id="tracking-area">
+        <!-- Área para ver produtos rastreados -->
+        <h2>Produtos Encontrados</h2>
+        <!-- Lista de produtos rastreados aqui -->
+    </div>
+
+    <table class="table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Nome</th>
+                    <th>Preco</th>
+                    <th>Rating</th>
+                    <th>Mudança de Preço</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products_list %}
+                <tr>
+                    <td><img class="imagem-padrao" src="{{product.img_src}}" alt="{{product.img_src}}"></td>
+                    <td><a href="#" class="product-link" data-toggle="modal" data-target="#productModal{{ product.id }}">{{ product.nome }}</a></td>
+                    <td>R$ {{product.preco}}</td>
+                    <td>{{product.rating}}</td>
+                    <td>{{'%0.2f' % product.last_price_change|float}}%</td>
+                </tr>
+
+                <!-- Modal para cada produto -->
+                <div class="modal fade" id="productModal{{ product.id }}" tabindex="-1" role="dialog" aria-labelledby="productModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="productModalLabel">{{ product.nome }}</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <!-- Conteúdo adicional sobre o produto aqui -->
+                                <img src="{{ product.img_src }}" alt="Imagem do Produto">
+                                <p>Preço: R$ {{ product.preco }}</p>
+                                <p>Rating: {{ product.rating }}</p>
+                                <p>Mudança de Preço: {{ '%0.2f' % product.last_price_change|float }}%</p>
+                                <a href="{{ product.product_link }}" target="_blank">Pagina da Loja</a>
+
+                                {% if product.registrado %}
+                                <!-- Exibir informações adicionais se o produto estiver registrado -->
+                                <p>Historico de Preços:</p>
+                                <canvas id="meuGrafico-{{ loop.index }}" width="400" height="200"></canvas>
+                                <script>
+                                    var ctx = document.getElementById('meuGrafico-{{ loop.index }}').getContext('2d');
+                                    var data = {
+                                        labels: {{ product.price_history_dates|tojson|safe }},
+                                        datasets: [{
+                                            label: 'Preços',
+                                            data: {{ product.price_history|tojson|safe }},
+                                            borderColor: 'rgba(75, 192, 192, 1)',
+                                            borderWidth: 2
+                                        }]
+                                    };
+                                    var meuGrafico = new Chart(ctx, {
+                                        type: 'line',
+                                        data: data
+                                    });
+                                </script>
+                                {% endif %}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </tbody>
+        </table>
+{% endblock %}

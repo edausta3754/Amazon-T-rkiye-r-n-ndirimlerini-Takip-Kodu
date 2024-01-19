@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>How's the Price?</title>
+    <!-- Adicione seus estilos CSS aqui -->
+    <style>
+        /* Estilos CSS */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+
+        #banner {
+            background-image: url('banner.jpeg');
+            background-size: cover;
+            height: 200px;
+            text-align: center;
+        }
+
+        #search-bar {
+            text-align: center;
+            padding: 20px;
+        }
+
+        #product-list {
+            margin: 20px;
+        }
+
+        /* Adicione mais estilos conforme necessário */
+    </style>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div id="banner">
+        <h1>Como está o Preço?</h1>
+    </div>
+
+    <div id="search-bar" class="d-flex">
+        <!-- Barra de pesquisa -->
+        <form class="d-flex" action="/produtos-rastreados" method="get" style="width: 90%;">
+            <input class="form-control flex-grow-1" type="text" id="search-input" name="search_term" placeholder="Digite o termo de pesquisa">
+            <!-- Botão de pesquisa -->
+            <input type="submit" class="btn btn-primary" value="Pesquisar">
+        </form>
+    </div>
+
+
+    <div class="d-flex justify-content-between">
+        <!-- Botão "Termo de Rastreados" -->
+        <a class="btn btn-primary" data-toggle="modal" data-target="#tracked_terms">Termos Rastreados</a>
+    </div>
+
+    <!-- Modal para os Termos Rastreados -->
+    <div class="modal fade" id="tracked_terms" tabindex="-1" role="dialog" aria-labelledby="trackedTermsModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="trackedTermLabel">Produtos Rastreados</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <ul class="product-list">
+                        {% for termo in lista_de_termos %}
+                        <li class="product-item">
+                            <form action="/remove_search_term" method="GET">
+                                <input type="hidden" name="id" value="{{ loop.index }}">
+                                {{termo}}
+                                <button class="remove-button">Deixar de Rastrear</button>
+                            </form>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <!-- Novo Produto -->
+                    <form class="d-flex" action="/register_search_term" method="GET">
+                        <input class="flex-grow-1" type="text" id="new-tracked-term" name="tracked-term" placeholder="Digite o termo a ser adicionado">
+                        <!-- Botão de pesquisa -->
+                        <button class="btn add-button ml-2">Adicionar Novo Produto</button>
+                    </form>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div>
+        {% block content %}{% endblock %}
+    </div>
+    <!-- Adicione scripts JavaScript conforme necessário -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
