@@ -1,0 +1,81 @@
+{% extends "index.html" %}
+{% block content %}
+    <div id="tracking-area">
+        <!-- Área para ver produtos rastreados -->
+        <h2>Bulunan Ürünler</h2>
+        <!-- Lista de produtos rastreados aqui -->
+    </div>   
+      
+    <table class="table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>İsim</th>
+                    <th>Fiyat</th>
+                    <th>Değerlendirme</th>
+                    <th>Fiyat Değişikliği</th>
+                    <th>Eski Fiyat</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products_list %}
+                <tr>
+                    <td><img class="imagem-padrao" src="{{product.img_src}}" alt="{{product.img_src}}"></td>
+                    <td><a href="#" class="product-link" data-toggle="modal" data-target="#productModal{{ product.id }}">{{ product.nome }}</a></td>
+                    <td> ₺ {{product.preco}}</td>
+                    <td>{{product.rating}}</td>
+                    <td>{{'%0.2f' % product.last_price_change|float}}%</td>
+                    <td> ₺ {{ product.old_price|default('N/A') }}</td>
+                </tr>
+  
+                <!-- Modal para cada produto -->
+                <div class="modal fade" id="productModal{{ product.id }}" tabindex="-1" role="dialog" aria-labelledby="productModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="productModalLabel">{{ product.nome }}</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <!-- Conteúdo adicional sobre o produto aqui -->
+                                <img src="{{ product.img_src }}" alt="Imagem do Produto">
+                                <p>Fiyat: ₺ {{ product.preco }}</p>
+                                <p>Değerlendirme: {{ product.rating }}</p>
+                                <p>Fiyat Değişikliği: {{ '%0.2f' % product.last_price_change|float }}%</p>
+                                <a href="{{ product.product_link }}" target="_blank">Mağaza Sayfası</a>
+
+                                {% if product.registrado %}
+                                <!-- Exibir informações adicionais se o produto estiver registrado -->
+                                <p>Fiyat Geçmişi:</p>
+                                <canvas id="meuGrafico-{{ loop.index }}" width="400" height="200"></canvas>
+                                <script>
+                                    var ctx = document.getElementById('meuGrafico-{{ loop.index }}').getContext('2d');
+                                    var data = {
+                                        labels: {{ product.price_history_dates|tojson|safe }},
+                                        datasets: [{
+                                            label: 'Fiyatlandırma',
+                                            data: {{ product.price_history|tojson|safe }},
+                                            borderColor: 'rgba(75, 192, 192, 1)',
+                                            borderWidth: 2
+                                        }]
+                                    };
+                                    var meuGrafico = new Chart(ctx, {
+                                        type: 'line',
+                                        data: data
+                                    });
+                                </script>
+                                {% endif %}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </tbody>
+        </table>
+{% endblock %}
